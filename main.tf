@@ -234,26 +234,27 @@ resource "aws_kms_key" "secret-key" {
   description = "DB secret key"
 }
 
-# resource "random_password" "db-password" {
-#   length = 16
-#   special = true
-#   override_special = "_****"
-# }
+resource "random_password" "db-password" {
+  length           = 20
+  special          = true
+  override_special = "!#$%^&*()-_=+[]{}<>:?"
+  keepers = {
+    pass_version = 1
+  }
+}
 
 #Launch one RDS MySQL instance in a private subnet 
 resource "aws_db_instance" "mysql" {
-  allocated_storage     = 20
-  max_allocated_storage = 50
-  db_subnet_group_name  = aws_db_subnet_group.rds-mysql-subnet-group.id 
-  db_name               = "terraformmysql"
-  engine                = "mysql"
-  engine_version        = "8.0.32"
-  instance_class        = "db.t3.micro"
-  port                  = "3306"
-  username              = "admin"
-  password              = "dbpassword-test"
-  # manage_master_user_password = true
-  # master_user_secret_kms_key_id = aws_kms_key.secret-key.key_id
+  allocated_storage      = 20
+  max_allocated_storage  = 50
+  db_subnet_group_name   = aws_db_subnet_group.rds-mysql-subnet-group.id
+  db_name                = "terraformmysql"
+  engine                 = "mysql"
+  engine_version         = "8.0.32"
+  instance_class         = "db.t3.micro"
+  port                   = "3306"
+  username               = "admin"
+  password               = random_password.db-password.result
   vpc_security_group_ids = [aws_security_group.terraform-data-tier-sg.id]
   availability_zone      = "us-east-2a"
   storage_encrypted      = true
