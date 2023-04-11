@@ -241,12 +241,11 @@ resource "aws_kms_key" "secret-key" {
 # }
 
 #Launch one RDS MySQL instance in a private subnet 
-resource "aws_db_instance" "rds-mysql" {
-  for_each              = var.private-subnets
+resource "aws_db_instance" "mysql" {
   allocated_storage     = 20
   max_allocated_storage = 50
-  db_subnet_group_name  = aws_db_subnet_group.rds-mysql-subnet-group[each.key].id
-  db_name               = "terraform-mysql"
+  db_subnet_group_name  = aws_db_subnet_group.rds-mysql-subnet-group.id 
+  db_name               = "terraformmysql"
   engine                = "mysql"
   engine_version        = "8.0.32"
   instance_class        = "db.t3.micro"
@@ -268,7 +267,7 @@ resource "aws_db_instance" "rds-mysql" {
 
 resource "aws_db_subnet_group" "rds-mysql-subnet-group" {
   name       = "terraform-db-subnet-group"
-  subnet_ids = [aws_subnet.private-subnets-tf.id]
+  subnet_ids = [for subnet in aws_subnet.private-subnets-tf : subnet.id]
 
   tags = {
     Name = "terraform-db-subnet-group"
