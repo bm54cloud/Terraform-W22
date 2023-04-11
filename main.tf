@@ -242,9 +242,10 @@ resource "aws_kms_key" "secret-key" {
 
 #Launch one RDS MySQL instance in a private subnet 
 resource "aws_db_instance" "rds-mysql" {
+  for_each              = var.private-subnets
   allocated_storage     = 20
   max_allocated_storage = 50
-  db_subnet_group_name  = aws_db_subnet_group.rds-mysql-subnet-group.id 
+  db_subnet_group_name  = aws_db_subnet_group.rds-mysql-subnet-group[each.key].id
   db_name               = "terraform-mysql"
   engine                = "mysql"
   engine_version        = "8.0.32"
@@ -255,9 +256,9 @@ resource "aws_db_instance" "rds-mysql" {
   # manage_master_user_password = true
   # master_user_secret_kms_key_id = aws_kms_key.secret-key.key_id
   vpc_security_group_ids = [aws_security_group.terraform-data-tier-sg.id]
-  availability_zone = "us-east-2a"
+  availability_zone      = "us-east-2a"
   storage_encrypted      = true
-  deletion_protection = true 
+  deletion_protection    = true
   skip_final_snapshot    = true
 
   tags = {
@@ -266,13 +267,15 @@ resource "aws_db_instance" "rds-mysql" {
 }
 
 resource "aws_db_subnet_group" "rds-mysql-subnet-group" {
-  name = "terraform-db-subnet-group"
-  subnet_ids = [aws_subnet.private-subnets-tf["private-subnet-1"].id]
-  
+  name       = "terraform-db-subnet-group"
+  subnet_ids = [aws_subnet.private-subnets-tf.id]
+
   tags = {
     Name = "terraform-db-subnet-group"
   }
 }
+
+# availability_zone       = tolist(data.aws_availability_zones.available-azs.names)[each.value - 1]
 
 #Create security group for database tier from the web-server tier
 resource "aws_security_group" "terraform-data-tier-sg" {
