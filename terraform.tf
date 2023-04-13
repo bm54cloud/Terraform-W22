@@ -1,12 +1,11 @@
-#Declare S3 backend
-#https://developer.hashicorp.com/terraform/language/settings/backends/s3
+#Declare Terraform Cloud backend
 terraform {
-  backend "s3" {
-    bucket = "terraform-s3backend-w22project"
-    key    = "State-Files/terraform.tfstate"
-    region = "us-east-2"
+  cloud {
+    organization = "bm54cloud"
 
-    dynamodb_table = "Terraform-s3-backened-w22"
-    encrypt        = true
+    workspaces {
+      tags        = ["W22project"]
+      description = "Workspace for Week 22 project"
+    }
   }
 }

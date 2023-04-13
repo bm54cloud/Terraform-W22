@@ -115,25 +115,6 @@ resource "aws_nat_gateway" "nat-gateway" {
   }
 }
 
-# #Create EC2 instance with bootstrap Apache in each public subnet
-# resource "aws_instance" "web-server" {
-#   ami           = var.ami
-#   instance_type = var.instance_type
-#   key_name      = var.key_name
-#   depends_on     = [aws_subnet.private-subnets-tf]
-#   for_each                = var.public-subnets
-#   availability_zone       = tolist(data.aws_availability_zones.available-azs.names)[each.value - 1]
-#   vpc_security_group_ids = [aws_security_group.terraform-sg.id]
-#   user_data                   = file("apache-install.sh")
-#   user_data_replace_on_change = true
-#   associate_public_ip_address = true
-
-#   tags = {
-#     Name        = "web-server"
-#     Environment = "dev"
-#   }
-# }
-
 #Create a security group that allows traffic from the internet 
 resource "aws_security_group" "terraform-web-tier-sg" {
   name   = "terraform-sg-web"
@@ -155,14 +136,6 @@ resource "aws_security_group" "terraform-web-tier-sg" {
     cidr_blocks = [var.cidr]
   }
 
-  ingress {
-    description = "Allow all HTTPS"
-    from_port   = var.HTTPS
-    to_port     = var.HTTPS
-    protocol    = var.tcp
-    cidr_blocks = [var.cidr]
-  }
-
   egress {
     description = "Allow all outbound"
     from_port   = var.egress-all
@@ -179,14 +152,6 @@ resource "aws_security_group" "terraform-web-tier-sg" {
     Name = "Terraform SG"
   }
 }
-
-
-
-#Deploy infrastructure using Terraform Cloud
-
-
-#Push code to GitHub
-
 
 #Obtain public subnets created in VPC
 data "aws_subnets" "public" {
