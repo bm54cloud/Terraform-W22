@@ -12,8 +12,6 @@ data "aws_subnets" "public" {
 
 #Launch an EC2 instance with bootstrapped Apache in each public subnet
 resource "aws_instance" "web-server" {
-  #   depends_on                  = [aws_subnet.public-subnets-tf]
-  # for_each                    = toset(data.aws_subnets.public)
   for_each                    = toset(data.aws_subnets.public.ids)
   ami                         = var.ami
   instance_type               = var.instance_type
@@ -29,3 +27,4 @@ resource "aws_instance" "web-server" {
     Environment = "dev"
   }
 }
+
