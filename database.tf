@@ -10,19 +10,6 @@ data "aws_subnets" "private" {
   }
 }
 
-resource "aws_kms_key" "secret-key" {
-  description = "DB secret key"
-}
-
-resource "random_password" "db-password" {
-  length           = 20
-  special          = true
-  override_special = "!#$%^&*()-_=+[]{}<>:?"
-  keepers = {
-    pass_version = 1
-  }
-}
-
 #Launch one RDS MySQL instance in a private subnet 
 resource "aws_db_instance" "mysql" {
   allocated_storage      = 20
@@ -33,8 +20,8 @@ resource "aws_db_instance" "mysql" {
   engine_version         = "8.0.32"
   instance_class         = "db.t3.micro"
   port                   = "3306"
-  username               = "admin"
-  password               = random_password.db-password.result
+  username               = var.username
+  password               = var.password
   vpc_security_group_ids = [aws_security_group.terraform-data-tier-sg.id]
   availability_zone      = "us-east-2a"
   storage_encrypted      = true
@@ -46,6 +33,7 @@ resource "aws_db_instance" "mysql" {
   }
 }
 
+#Create database subnet group
 resource "aws_db_subnet_group" "rds-mysql-subnet-group" {
   name       = "terraform-db-subnet-group"
   subnet_ids = [for subnet in aws_subnet.private-subnets-tf : subnet.id]

@@ -81,3 +81,12 @@ variable "key_name" {
   default     = "EC2-Ohio"
 }
 
+variable "password" {
+  type = string
+  default = ""
+}
+
+variable "username" {
+  type = string  
+  default = ""
+}

@@ -1,5 +1,3 @@
-# availability_zone       = tolist(data.aws_availability_zones.available-azs.names)[each.value - 1]
-
 #Create security group for database tier from the web-server tier
 resource "aws_security_group" "terraform-data-tier-sg" {
   name   = "terraform-sg-data"
