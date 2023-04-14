@@ -85,4 +85,3 @@ variable "password" {}
 
 variable "username" {}
 
-variable "test" {}
