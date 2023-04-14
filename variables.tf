@@ -84,3 +84,5 @@ variable "key_name" {
 variable "password" {}
 
 variable "username" {}
+
+variable "test" {}
