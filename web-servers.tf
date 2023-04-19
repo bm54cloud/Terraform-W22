@@ -10,6 +10,15 @@ data "aws_subnets" "public" {
   }
 }
 
+data "aws_ami" "server-ami" {
+ owners = ["amazon"]
+ most_recent = true
+ filter {
+ name = "name"
+ values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+ }
+}
+
 #Launch an EC2 instance with bootstrapped Apache in each public subnet
 resource "aws_instance" "web-server" {
   for_each                    = toset(data.aws_subnets.public.ids)
